@@ -1,0 +1,224 @@
+---
+- hosts: localhost
+  gather_facts: yes
+
+  pre_tasks:
+
+    - name: Install prereq
+      command: dnf -y install python2-dnf
+      changed_when: False
+
+  tasks:
+
+    - name: RPMfusion Free repo
+      package:
+        name: https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_distribution_major_version }}.noarch.rpm
+        state: present
+
+    - name: RPMfusion non-Free repo
+      package:
+        name: https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ ansible_distribution_major_version }}.noarch.rpm
+        state: present
+
+    - name: Add Google Chrome repo
+      yum_repository:
+        name: google-chrome
+        description: google-chrome - \$basearch
+        baseurl: http://dl.google.com/linux/chrome/rpm/stable/\$basearch
+        gpgkey: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        enabled: yes
+        gpgcheck: yes
+        state: present
+
+    - name: Add Chrome Gnome Shell fedora-copr repo
+      yum_repository:
+        name: region51-chrome-gnome-shell
+        description: Copr repo for chrome-gnome-shell owned by region51
+        baseurl: https://copr-be.cloud.fedoraproject.org/results/region51/chrome-gnome-shell/fedora-$releasever-$basearch/
+        gpgkey: https://copr-be.cloud.fedoraproject.org/results/region51/chrome-gnome-shell/pubkey.gpg
+        skip_if_unavailable: yes
+        enabled: yes
+        gpgcheck: yes
+        state: present
+
+    - name: Add Atom fedora-copr repo
+      yum_repository:
+        name: mosquito-atom
+        description: Copr repo for atom owned by mosquito
+        baseurl: https://copr-be.cloud.fedoraproject.org/results/mosquito/atom/fedora-$releasever-$basearch/
+        gpgkey: https://copr-be.cloud.fedoraproject.org/results/mosquito/atom/pubkey.gpg
+        skip_if_unavailable: yes
+        enabled: yes
+        gpgcheck: yes
+        state: present
+
+    - name: Add Tilix (aka Terminix) fedora-copr repo
+      yum_repository:
+        name: heikoada-terminix
+        description: Copr repo for terminix owned by heikoada
+        baseurl: https://copr-be.cloud.fedoraproject.org/results/heikoada/terminix/fedora-$releasever-$basearch/
+        gpgkey: https://copr-be.cloud.fedoraproject.org/results/heikoada/terminix/pubkey.gpg
+        skip_if_unavailable: yes
+        enabled: yes
+        gpgcheck: yes
+        state: present
+
+    - name: Install Tilix terminal
+      package:
+        name: tilix
+        state: latest
+
+    - name: Install Chromium Browser
+      package:
+        name: chromium
+        state: latest
+
+    - name: Install Google Chome (Stable)
+      package:
+        name: google-chrome-stable
+        state: latest
+
+    - name: Install Chrome Gnome Shell
+      package:
+        name: chrome-gnome-shell
+        state: latest
+
+    - name: Install some gnome-shell extensions
+      package:
+        name: '{{ item }}'
+        state: latest
+      with_items: 
+        - gnome-shell-extension-pomodoro
+
+    - name: Install Pidgin + Pidgin SIPE
+      package:
+        name: '{{ item }}'
+        state: latest
+      with_items:
+        - pidgin
+        - pidgin-sipe
+
+# FIXME: It will download the rpm everytime!
+#    - name: Install Slack
+#      package:
+#        name: https://downloads.slack-edge.com/linux_releases/slack-2.5.2-0.1.fc21.x86_64.rpm
+#        state: present
+
+    - name: Install Virt-Manager
+      package:
+        name: virt-manager
+        state: latest
+
+    - name: Install Diodon clipboard manager
+      package:
+        name: diodon
+        state: latest
+
+    - name: Install Evolution EWS (for Exchange)
+      package:
+        name: evolution-ews
+        state: latest
+
+    - name: Install libvirt-based Vagrant
+      package:
+        name: vagrant-libvirt
+        state: latest
+
+    - name: Install Gnome Tweak Tool
+      package:
+        name: gnome-tweak-tool
+        state: latest
+
+    - name: Install Gnome PackageKit
+      package:
+        name: gnome-packagekit
+        state: latest
+
+    - name: Install various multimedia codecs (Fedy)
+      package:
+        name: '{{ item }}'
+        state: latest
+      with_items:
+        - a52dec
+        - amrnb
+        - amrwb
+        - faac
+        - faad2
+        - faad2-libs
+        - fedy-multimedia-codecs
+        - ffmpeg-libs
+        - fftw-libs-double
+        - flac
+        - fribidi
+        - gstreamer
+        - gstreamer-ffmpeg
+        - gstreamer-plugins-bad
+        - gstreamer-plugins-bad-free
+        - gstreamer-plugins-bad-nonfree
+        - gstreamer-plugins-base
+        - gstreamer-plugins-espeak
+        - gstreamer-plugins-fc
+        - gstreamer-plugins-good
+        - gstreamer-plugins-ugly
+        - gstreamer-rtsp
+        - gstreamer-tools
+        - gstreamer1-libav
+        - gstreamer1-plugins-bad-freeworld
+        - gstreamer1-plugins-ugly
+        - lame
+        - lame-libs
+        - libass
+        - libdca
+        - libebml
+        - libfc14audiodecoder
+        - libmad
+        - libmatroska
+        - libmfx
+        - libmimic
+        - libmms
+        - libmp4v2
+        - libmpeg2
+        - libofa
+        - librtmp
+        - libva
+        - mjpegtools-libs
+        - ocl-icd
+        - opencore-amr
+        - schroedinger
+        - twolame-libs
+        - vo-amrwbenc
+        - x264
+        - x264-libs
+        - x265
+        - x265-libs
+        - xvidcore
+
+    - name: Install various archive formats (Fedy)
+      package:
+        name: '{{ item }}'
+        state: latest
+      with_items:
+        - cabextract
+        - lzip
+        - p7zip
+        - p7zip-plugins
+        - unrar
+
+    - name: Install GTK and icon themes from the Numix Project (Fedy)
+      package:
+        name: '{{ item }}'
+        state: latest
+      with_items:
+        - numix-icon-theme
+        - numix-icon-theme-circle
+        - numix-gtk-theme
+
+    - name: Install Atom editor
+      package:
+        name: atom
+        state: latest
+
+    - name: Install oathtool for OTP authentication
+      package:
+        name: oathtool
+        state: latest
